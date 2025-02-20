@@ -63,7 +63,17 @@ class LiveKitServer:
         async def create_room(data: CreateRoomData):
             """Endpoint to create a new room with JSON parameters"""
             livekit_api = api.LiveKitAPI()
-            room = await livekit_api.room.create_room(name=data.room_name)
+            request = api.CreateRoomRequest(
+                name=data.room_name,
+                empty_timeout=300,
+                max_participants=10,
+                metadata="{}",
+                egress=None,
+                min_playout_delay=0,
+                max_playout_delay=0,
+                sync_streams=False
+            )
+            room = await livekit_api.room.create_room(request)
             await livekit_api.aclose()
             return {"message": f"Successfully created room {room.name}"}
 
@@ -82,10 +92,10 @@ class LiveKitServer:
             return {"token": token_value}
 
         @self.app.post("/agent_join")
-        async def agent_join():
+        async def agent_join(data: CreateRoomData):
             """Endpoint to execute the agent script"""
             process = await asyncio.create_subprocess_exec(
-                "python", "agent.py",
+                "python", "agents.py", "connect", f"--room={data.room_name}",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -93,6 +103,18 @@ class LiveKitServer:
             if process.returncode == 0:
                 return {"message": "Agent script executed successfully", "output": stdout.decode()}
             return {"message": "Agent script execution failed", "error": stderr.decode()}
+
+        @self.app.post("/kick_participant")
+        async def kick_participant(data: JoinRoomData):
+            """Endpoint to kick a participant by their identity"""
+            livekit_api = api.LiveKitAPI()
+            request = api.RoomParticipantIdentity(
+                room=data.room_name,
+                identity=data.identity
+            )
+            await livekit_api.room.remove_participant(request)
+            await livekit_api.aclose()
+            return {"message": f"Successfully kicked participant {data.identity} from room {data.room_name}"}
 
 def run_server():
     server = LiveKitServer()
