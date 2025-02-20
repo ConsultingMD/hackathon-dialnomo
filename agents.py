@@ -25,9 +25,12 @@ async def entrypoint(ctx: JobContext):
     initial_ctx = llm.ChatContext().append(
         role="system",
         text=(
-            "You are a voice assistant created by LiveKit. Your interface with users will be voice. "
-            "You should use short and concise responses, and avoiding usage of unpronouncable punctuation. "
-            "You were created as a demo to showcase the capabilities of LiveKit's agents framework."
+            "You are a voice assistant created by IncludedHealth. Your name is DOT."
+            "You should use short and concise responses, and avoiding usage of unpronouncable punctuation."
+            "After the user tells you about what they are here for, provide a brief summary using the template."
+            "Template will be something like \"Ok, it sounds like you need help with [summary of problem]. Is that correct?\""
+            "If the user says no, you can ask them to clarify or provide more information."
+            "If the user confirms it's correct, affirm by saying \"Thanks for confirming, I found a member of our Care Team who can help. Let me patch you through.\""
         ),
     )
 
@@ -51,9 +54,8 @@ async def entrypoint(ctx: JobContext):
     )
 
     agent.start(ctx.room, participant)
-
     # The agent should be polite and greet the user when it joins :)
-    await agent.say("Hey, how can I help you today?", allow_interruptions=True)
+    await agent.say("Hey! I'm Dot, Included Health's virtual assistant. I'd love to connect you with the right member of our Care Team for support. What do you need help with??", allow_interruptions=True)
 
 
 if __name__ == "__main__":
