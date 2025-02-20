@@ -4,6 +4,7 @@ from livekit import api
 import os
 from livekit.protocol.sip import CreateSIPParticipantRequest
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from pydantic import BaseModel, Field
 
@@ -12,7 +13,20 @@ load_dotenv(dotenv_path=".env.local")
 class LiveKitServer:
     def __init__(self):
         self.app = FastAPI()
+        self.allowed_origins = [
+            "http://localhost:10055"
+        ]
+        self._setup_middlewares()
         self._setup_routes()
+
+    def _setup_middlewares(self):
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=self.allowed_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     def _setup_routes(self):
         # Request models
