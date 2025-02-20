@@ -1,0 +1,3 @@
+ai-agent/venv/*
+ai-agent/venv
+ai-agent/.env.local
