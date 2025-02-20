@@ -55,7 +55,7 @@ async def entrypoint(ctx: JobContext):
 
     agent.start(ctx.room, participant)
     # The agent should be polite and greet the user when it joins :)
-    await agent.say("Hey! I'm Dot, Included Health's virtual assistant. I'd love to connect you with the right member of our Care Team for support. What do you need help with??", allow_interruptions=True)
+    await agent.say("Hey! I'm Dot, Included Health's virtual assistant. I'd love to connect you with the right member of our Care Team for support. What do you need help with?", allow_interruptions=True)
 
 
 if __name__ == "__main__":
